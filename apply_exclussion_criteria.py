@@ -9,6 +9,7 @@ It is intended to streamline and expedite literature review tasks, providing res
 # TO DO:
 # 1.- Parametrize the script to assign expertises to the assistant in relevant fields for the review.
 # 2.- Split functionality in modules, so the user may manipulate the creation of graphics, the application of the exclusion criteria, and the creation of the exclusion criteria separately.
+# 3.- Add a flag column to know if a row has been processed or not. This way, the user may run the script multiple times on the same CSV file, and it will only process the rows that have not been processed yet.
 
 import argparse
 import openai
