@@ -6,7 +6,9 @@ The script is provided under the MIT license, offered as-is, without any liabili
 It is intended to streamline and expedite literature review tasks, providing researchers with efficient and automated analysis of research papers. """
 ########### Author: Roberto Martínez, May 29, 2023 ############
 
-# TO DO: Parametrize the script to assign expertises to the assistant in relevant fields for the review.
+# TO DO:
+# 1.- Parametrize the script to assign expertises to the assistant in relevant fields for the review.
+# 2.- Split functionality in modules, so the user may manipulate the creation of graphics, the application of the exclusion criteria, and the creation of the exclusion criteria separately.
 
 import argparse
 import openai
