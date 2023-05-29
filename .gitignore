@@ -161,8 +161,12 @@ cython_debug/
 
 # Specific files and folders
 query_results/
-*ec_processed/
+*ec_processed*/
 *.csv
 *.json
 *.txt
 *.xlsx
+*.zip
+*.png
+*.jpg
+*.pdf
