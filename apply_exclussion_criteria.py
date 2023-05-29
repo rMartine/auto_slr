@@ -118,4 +118,4 @@ if __name__ == "__main__":
 # 6. The max_tokens parameter for the OpenAI API. Default is 3.
 
 # Example usage:
-# py apply_exclussion_criteria.py papers.csv exclusion_criteria.json %OPENAI_API_KEY% gpt-4 --temperature 0.5 --max_tokens 3
+# py apply_exclussion_criteria.py review_test.csv exclusion_criteria.json %OPENAI_API_KEY% gpt-4 --temperature 0.5 --max_tokens 3
