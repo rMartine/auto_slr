@@ -12,6 +12,7 @@ It is intended to streamline and expedite literature review tasks, providing res
 # 3.- Add a flag column to know if a row has been processed or not. This way, the user may run the script multiple times on the same CSV file, and it will only process the rows that have not been processed yet.
 
 import argparse
+import time
 import openai
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -42,14 +43,25 @@ def main():
         print(f"File not found: {e}")
         return
     
-    assistantRole = "You are an expert scitific researcher expert in the fields of multimedia, Virtual Reality, Metaverse, eHealth and signal processing."
+    assistantRole = "Act as an expert scitific researcher expert in the fields of multimedia, Virtual Reality, Metaverse, eHealth and signal processing."
+    # Check if the dataset has a column "processesed", if not, add it and assign False to all rows
+    if 'processed' not in df.columns:
+        df['processed'] = False
+    elif df['processed'].all():
+        print("All papers have been processed.")
+        return
+    df = df[df['processed'] == False]
+    # Save the rest of the records to join them back after processing the unprocessed ones
+    df_rest = df[df['processed'] == True]
+        
     
     # Check each paper against each exclusion criterion
-    # Add a progress bar indicator using tqdm
+    # TO DO: Drill down into more detailed error handling and noting it in the dataframe
     for index, row in tqdm(df.iterrows(), total=df.shape[0]):
         title = row['Title']
         abstract = row['Abstract']
         
+        errorFlag = False
         for criterion in exclusion_criteria:
             prompt = f"The following abstract is from the paper titled '{title}':\n\n{abstract}\n\nDoes this paper title or abstract {criterion['description']}? Please answer with 'Yes' or 'No'."
             # Try to generate a response from the model if the create method fails, save the response in the unexpected column and move to the next paper
@@ -71,17 +83,28 @@ def main():
                     # Save the response to the unexpected columns and move to the next paper
                     print(f"Unexpected response for paper '{title}': {response_text}")
                     df.at[index, 'unexpected'] = response_text
+                    errorFlag = True
                     continue
                 # Add a new column for this criterion
                 df.at[index, criterion['criteriaId']] = response_text == 'yes'
             except Exception as e:
                 print(f"Exception for paper '{title}': {e}")
                 df.at[index, 'unexpected'] = str(e)
+                errorFlag = True
                 continue
-
+            # Wait for 0.5 seconds to avoid hitting the API rate limit
+            time.sleep(1)
+        if errorFlag:
+            df.at[index, 'processed'] = False
+        else:
+            df.at[index, 'processed'] = True
+    
     # Create the 'excluded' column
     criteria_columns = [criterion['criteriaId'] for criterion in exclusion_criteria]
     df['excluded'] = df[criteria_columns].apply(lambda row: any(row), axis=1)
+
+    # Put back together both datasets stacking them vertically
+    df = pd.concat([df, df_rest], ignore_index=True)
             
     # Save the updated DataFrame to a new CSV file
     base, ext = os.path.splitext(args.csvfile)
